@@ -1,11 +1,16 @@
-Scene With Spheres and Obilisks:
+Scene With Spheres and Obilisks (With different projections):
 By Forrest Tagg Ridler | forrest.ridler@colorado.edu
 
 Instructions:
 
 arrow keys = natural rotation
 'm' = toggle obilisks/spheres (there's two scenes)
+'p' = toggle between perspective and orthagonal projections
 'ESC' = terminate program
+
+when in perspective mode:
+'+' = zoom in (modify field of view)
+'-' = zoom out (modify field of view)
 
 when the spheres are displayed:
 'c/C' = decrease/increase the distance between the spheres
