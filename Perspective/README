@@ -1,0 +1,11 @@
+Scene With Spheres and Obilisks:
+By Forrest Tagg Ridler | forrest.ridler@colorado.edu
+
+Instructions:
+
+arrow keys = natural rotation
+'m' = toggle obilisks/spheres (there's two scenes)
+'ESC' = terminate program
+
+when the spheres are displayed:
+'c/C' = decrease/increase the distance between the spheres

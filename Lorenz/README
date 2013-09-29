@@ -1,0 +1,22 @@
+Modifiable Lorez Attractor:
+By Forrest Tagg Ridler | forrest.ridler@colorado.edu
+
+
+Strange Attractor Instructions:
+
+'+' = zoom in
+'-' = zoom out
+'z/Z' = rotate z-axis
+arrow keys = natural rotation
+'s' = decrease s parameter (increase with 'S')
+'b' = decrease b parameter (increase with 'B')
+'r' = decrease r parameter (increase with 'R')
+'i' = toggle on-screne display of the parameters
+'ESC' = terminate program
+
+
+What I Learned:
+
+In my opinion, the neatest thing to do is hold 's' and watch what happens as it becomes more and more negative.  At s ~ -3, the system appears to 'blow up.'
+
+This assignment took approximately 5-6 hours.
