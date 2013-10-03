@@ -2,6 +2,7 @@
 // By Forrest Tagg Ridler | forrest.ridler@colorado.edu
 
 // Animation structure and basic shapes based on ex8.c
+// Projection set-up and calculations based on ex9.c
 
 #include <cstdlib>
 #include <cmath>
@@ -219,27 +220,22 @@ static void drawObilisk(float x, float y, float z,
 
 static void project()
 {
-   //  Tell OpenGL we want to manipulate the projection matrix
    glMatrixMode(GL_PROJECTION);
-   //  Undo previous transformations
    glLoadIdentity();
    //  Perspective transformation
    if (perspec) { gluPerspective(fov,asp,dim/4,4*dim); }
    //  Orthogonal projection
    else
    	{ glOrtho(-asp*dim,+asp*dim, -dim,+dim, -dim,+dim); }
-   //  Switch to manipulating the model matrix
+
    glMatrixMode(GL_MODELVIEW);
-   //  Undo previous transformations
    glLoadIdentity();
 }
 
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-   //  Enable Z-buffering in OpenGL
 	glEnable(GL_DEPTH_TEST);
-   //  Undo previous transformations
 	glLoadIdentity();
    //  Set view angle
 	if (perspec)
@@ -256,7 +252,6 @@ void display()
       glRotatef(th,0,1,0);
    }
 
-   //  Decide what to draw
 	if(spheres) { sphereLattice(0,0,0,0.1,3,cubeSep); }
 	else if(obilisk)
 	{
@@ -317,11 +312,14 @@ void display()
  		case 'm': obilisk = !obilisk; spheres = !spheres; break;
  		case 'c': cubeSep -= 0.01; break;
  		case 'C': cubeSep += 0.01; break;
- 		case '+': fov++; break;
- 		case '-': fov--; break;
+ 		case '+': fov--; break;
+ 		case '-': fov++; break;
  		case 'p': perspec = !perspec;
  		default: break;
  	}
+ 	// make it more of a zoom-in feature:
+ 	if(fov < 0) { fov = 0; }
+
  	project();
  	glutPostRedisplay();
  }
@@ -330,30 +328,21 @@ void reshape(int width,int height)
 {
    //  Ratio of the width to the height of the window
    asp = (height>0) ? (double)width/height : 1;
-   //  Set the viewport to the entire window
+
    glViewport(0,0, width,height);
-   //  Set projection
    project();
 }
 
  int main(int argc,char* argv[])
  {
-   //  Initialize GLUT and process user parameters
  	glutInit(&argc,argv);
-   //  Request double buffered, true color window with Z buffering at 600x600
  	glutInitWindowSize(600,600);
  	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-   //  Create the window
- 	glutCreateWindow("Objects");
-   //  Tell GLUT to call "display" when the scene should be drawn
+ 	glutCreateWindow("Objects with Projections");
  	glutDisplayFunc(display);
-   //  Tell GLUT to call "reshape" when the window is resized
  	glutReshapeFunc(reshape);
-   //  Tell GLUT to call "special" when an arrow key is pressed
  	glutSpecialFunc(special);
-   //  Tell GLUT to call "key" when a key is pressed
  	glutKeyboardFunc(key);
-   //  Pass control to GLUT so it can interact with the user
  	glutMainLoop();
  	return 0;
  }
