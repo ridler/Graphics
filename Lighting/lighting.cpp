@@ -17,7 +17,7 @@
 // parameters for lighting
 unsigned char one       =   1;  // Unit value
 unsigned char distance  =   5;  // Light distance
-float inc 		        =  10;  // Ball increment
+float inc 		        =   1;  // Ball increment
 unsigned char smooth    =   1;  // Smooth/Flat shading
 short local    			=   0;  // Local Viewer Model
 unsigned char emission  =   0;  // Emission intensity (%)
