@@ -1,8 +1,9 @@
-// Scenes without textures or lighting
+// Scenes with modifiable lighting
 // By Forrest Tagg Ridler | forrest.ridler@colorado.edu
 
 // Animation structure and basic shapes based on ex8.c
 // Projection set-up and calculations based on ex9.c
+// Lighting parameters and switch based on ex13.c
 
 #include <cstdlib>
 #include <cmath>
@@ -16,7 +17,7 @@
 // parameters for lighting
 unsigned char one       =   1;  // Unit value
 unsigned char distance  =   5;  // Light distance
-unsigned char inc       =  10;  // Ball increment
+float inc 		        =  10;  // Ball increment
 unsigned char smooth    =   1;  // Smooth/Flat shading
 short local    			=   0;  // Local Viewer Model
 unsigned char emission  =   0;  // Emission intensity (%)
@@ -285,7 +286,7 @@ void display()
       //  Flat or smooth shading
 	glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
 
-   //  Light switch
+   //  if(light) block from ex13.c
 	if (light)
 	{
         //  Translate intensity to color vectors
@@ -382,12 +383,13 @@ void key(unsigned char k, int x, int y)
 		case 's': move = !move; break;
 		case '<': ylight++; break;
 		case '>': ylight--; break;
-		case 'v': inc--; break;
-		case 'V': inc++; break;
+		case 'v': inc -= 0.1; break;
+		case 'V': inc += 0.1; break;
 		default: break;
 	}
  	// make it more of a zoom-in feature:
 	if(fov < 0) { fov = 0; }
+	if(inc < 0) { inc = 0; }
 
 	project();
 	glutPostRedisplay();
@@ -407,7 +409,7 @@ void idle()
 	if(move)
 	{
    //  Elapsed time in seconds
-		double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
+		double t = inc*glutGet(GLUT_ELAPSED_TIME)/(1000.0);
 		zh = fmod(90*t,360.0);
    //  Tell GLUT it is necessary to redisplay the scene
 		glutPostRedisplay();

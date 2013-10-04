@@ -1,0 +1,24 @@
+Scene With Spheres and Obilisks (With different projections):
+By Forrest Tagg Ridler | forrest.ridler@colorado.edu
+
+Instructions:
+
+arrow keys = natural rotation
+'m' = toggle obilisks/spheres (there's two scenes)
+'p' = toggle between perspective and orthagonal projections
+'ESC' = terminate program
+'+' = zoom in (modify field of view)
+'-' = zoom out (modify field of view)
+'l' = toggle light
+'s' = stop or start light orbit
+'<' = increase light elevation
+'>' = decrease light elevation
+
+DO NOT HOLD THESE BUTTONS (just press them):
+'v' = decrease light orbit speed
+'V' = increase light orbit speed
+
+when the spheres are displayed:
+'c/C' = decrease/increase the distance between the spheres
+
+This assignment took me about 4 hours.
