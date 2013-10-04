@@ -1,5 +1,5 @@
-CFILES := $(wildcard *.c)
-OUTFILE := ex
+CFILES := $(wildcard *.cpp)
+OUTFILE := lighting
 
 UNAME := $(shell uname -s)
 
@@ -14,7 +14,7 @@ endif
 
 all:
 	@echo $(ERROR)
-	gcc -Wall $(CFILES) -o $(OUTFILE) $(FLAGS)
+	g++ -Wall $(CFILES) -o $(OUTFILE) $(FLAGS)
 	@echo ""
 
 clean:
