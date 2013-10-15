@@ -194,58 +194,48 @@ static void pyramid(float x, float y, float z,
 		glScaled(dx,dy,dz);
 
 		glBegin(GL_TRIANGLES);
-		glNormal3f(1,0,1);
+
+		// Normals calculated using cross product of vectors
+		// pointing along the edges of the triangles.
 
 		glColor3f(1,1,1);
+		glNormal3f(0,2,4);
 		// first triangle
 		glVertex3f(1,0,1);
-		glNormal3f(0,2,0);
 		glVertex3f(0,2,0);
-		glNormal3f(-1,0,1);
 		glVertex3f(-1,0,1);
-		glNormal3f(-1,0,1); 
 
 		glColor3f(r,g,b);
+		glNormal3f(-4,2,0);
 		// second triangle
 		glVertex3f(-1,0,1);
-		glNormal3f(0,2,0);
 		glVertex3f(0,2,0);
-		glNormal3f(-1,0,-1);
 		glVertex3f(-1,0,-1);
-		glNormal3f(-1,0,-1);
 
 		glColor3f(1,1,1);
+		glNormal3f(0,2,-4);
 		// third triangle
 		glVertex3f(-1,0,-1);
-		glNormal3f(0,2,0);
 		glVertex3f(0,2,0);
-		glNormal3f(1,0,-1);
 		glVertex3f(1,0,-1);
-		glNormal3f(1,0,-1); 
 
 		glColor3f(r,g,b);
+		glNormal3f(4,2,0);
 		// last triangle
 		glVertex3f(1,0,-1);
-		glNormal3f(0,2,0);
 		glVertex3f(0,2,0);
-		glNormal3f(1,0,1);
 		glVertex3f(1,0,1);
 		glEnd();
 
 		// bottom square
-		glColor3f(.5,.5,.5);
 		glBegin(GL_TRIANGLES);
-		glNormal3f(-1,0,1);
+		glColor3f(.5,.5,.5);
+		glNormal3f(0,-1,0);
 		glVertex3f(-1,0,1);
-		glNormal3f(-1,0,-1);
 		glVertex3f(-1,0,-1);
-		glNormal3f(1,0,1);
 		glVertex3f(1,0,1);
-		glNormal3f(1,0,1);
 		glVertex3f(1,0,1);
-		glNormal3f(-1,0,-1);
 		glVertex3f(-1,0,-1);
-		glNormal3f(1,0,-1);
 		glVertex3f(1,0,-1);
 		glEnd();
 	}
