@@ -1,0 +1,18 @@
+Scene With Textured Obilisks:
+By Forrest Tagg Ridler | forrest.ridler@colorado.edu
+
+Instructions:
+
+arrow keys = natural rotation
+'ESC' = terminate program
+'+' = zoom in (modify field of view)
+'-' = zoom out (modify field of view)
+'s' = stop or start light orbit
+'<' = increase light elevation
+'>' = decrease light elevation
+
+DO NOT HOLD THESE BUTTONS (just press them):
+'v' = decrease light orbit speed
+'V' = increase light orbit speed
+
+This assignment took me about 4 hours.
