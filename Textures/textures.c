@@ -20,15 +20,15 @@ unsigned char specular  =   0;  // Specular intensity (%)
 unsigned short shininess =  2;  // Shininess (power of two)
 float shinyvec[1];    // Shininess (value)
 short zh        =  90;  // Light azimuth
-float ylight  =   0;  // Elevation of light
+float ylight = 0;  // Elevation of light
 
 unsigned int SANDSTONE = 0;
+unsigned int EARTH = 0;
 
 int th=0;	//  Azimuth of view angle
 int ph=0;	//  Elevation of view angle
 
 unsigned char obilisk = 1;	// toggle objects displayed
-unsigned char light = 1;	// light switch
 unsigned char move = 1;		// light orbital
 
 int fov = 50;	// field of view
@@ -36,177 +36,137 @@ int fov = 50;	// field of view
 float asp=1.0;	//  Aspemct ratio
 float dim=5.0;	//  Size of world
 
-float cubeSep = 0.05;	// user can change separation of sheres
-
-static inline void Vertex(double th,double ph)
+static void ball(double x,double y,double z,double r)
 {
-	double x = Sin(th)*Cos(ph);
-	double y = Cos(th)*Cos(ph);
-	double z =         Sin(ph);
-  	 //  For a sphere at the origin, the position
-  	 //  and normal vectors are the same
-	glNormal3d(x,y,z);
-	glVertex3d(x,y,z);
-}
-
-static void sphere(float x, float y, float z, float r)
-{
-	const unsigned char d = 5;
-	float yellow[] = {1.0,1.0,0.0,1.0};
-	float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-	short th,ph;
+   //  Save transformation
 	glPushMatrix();
-	{
-		glTranslated(x,y,z);
-		glScaled(r,r,r);
-		glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
-		glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-		glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-
-   		//  Latitude bands
-		for (ph=-90;ph<90;ph+=d)
-		{
-			glBegin(GL_QUAD_STRIP);
-			for (th=0;th<=360;th+=d)
-			{
-				Vertex(th,ph);
-				Vertex(th,ph+d);
-			}
-			glEnd();
-		}
-	}
+   //  Offset, scale and rotate
+	glTranslated(x,y,z);
+	glScaled(r,r,r);
+   //  White ball
+	glColor3f(1,1,1);
+	glutSolidSphere(1.0,16,16);
+   //  Undo transofrmations
 	glPopMatrix();
 }
 
 static void cube(float x, float y, float z,
-	float dx, float dy, float dz, unsigned char c[])
+	float dx, float dy, float dz, unsigned int tex)
 {
-	float white[] = {1,1,1,1};
-	float black[] = {0,0,0,1};
-	glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
-	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
-
-	unsigned char r, g, b;
-	r = c[0]; g = c[1]; b = c[2];
-
 	glPushMatrix();
-	{
-   //  Offset
-		glTranslated(x,y,z);
- 		//glRotated(th,0,1,0);
-		glScaled(dx,dy,dz);
-   //  Cube
-		glBegin(GL_QUADS);
-   //  Front
-		glColor3f(r,g,b);
-		glNormal3f(0,0,1);
-		glVertex3f(-1,-1, 1);
-		glVertex3f(+1,-1, 1);
-		glVertex3f(+1,+1, 1);
-		glVertex3f(-1,+1, 1);
-   //  Back
-		glColor3f(r,g,b);
-		glNormal3f(0,0,-1);
-		glVertex3f(+1,-1,-1);
-		glVertex3f(-1,-1,-1);
-		glVertex3f(-1,+1,-1);
-		glVertex3f(+1,+1,-1);
+
+	glTranslated(x,y,z);
+	glScaled(dx,dy,dz);
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+
+   //	Front
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glBegin(GL_QUADS);
+	glNormal3f( 0, 0, 1);
+	glTexCoord2f(0,0); glVertex3f(-1,-1, 1);
+	glTexCoord2f(1,0); glVertex3f(+1,-1, 1);
+	glTexCoord2f(1,1); glVertex3f(+1,+1, 1);
+	glTexCoord2f(0,1); glVertex3f(-1,+1, 1);
+	glEnd();
+   //	Back
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glBegin(GL_QUADS);
+	glNormal3f( 0, 0,-1);
+	glTexCoord2f(0,0); glVertex3f(+1,-1,-1);
+	glTexCoord2f(1,0); glVertex3f(-1,-1,-1);
+	glTexCoord2f(1,1); glVertex3f(-1,+1,-1);
+	glTexCoord2f(0,1); glVertex3f(+1,+1,-1);
+	glEnd();
    //  Right
-		glColor3f(1,1,1);
-		glNormal3f(1,0,0);
-		glVertex3f(+1,-1,+1);
-		glVertex3f(+1,-1,-1);
-		glVertex3f(+1,+1,-1);
-		glVertex3f(+1,+1,+1);
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glBegin(GL_QUADS);
+	glNormal3f(+1, 0, 0);
+	glTexCoord2f(0,0); glVertex3f(+1,-1,+1);
+	glTexCoord2f(1,0); glVertex3f(+1,-1,-1);
+	glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
+	glTexCoord2f(0,1); glVertex3f(+1,+1,+1);
+	glEnd();
    //  Left
-		glColor3f(1,1,1);
-		glNormal3f(-1,0,0);
-		glVertex3f(-1,-1,-1);
-		glVertex3f(-1,-1,+1);
-		glVertex3f(-1,+1,+1);
-		glVertex3f(-1,+1,-1);
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glBegin(GL_QUADS);
+	glNormal3f(-1, 0, 0);
+	glTexCoord2f(0,0); glVertex3f(-1,-1,-1);
+	glTexCoord2f(1,0); glVertex3f(-1,-1,+1);
+	glTexCoord2f(1,1); glVertex3f(-1,+1,+1);
+	glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
+	glEnd();
    //  Top
-		glColor3f(0.5,0.5,0.5);
-		glNormal3f(0,1,0);
-		glVertex3f(-1,+1,+1);
-		glVertex3f(+1,+1,+1);
-		glVertex3f(+1,+1,-1);
-		glVertex3f(-1,+1,-1);
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glBegin(GL_QUADS);
+	glNormal3f( 0,+1, 0);
+	glTexCoord2f(0,0); glVertex3f(-1,+1,+1);
+	glTexCoord2f(1,0); glVertex3f(+1,+1,+1);
+	glTexCoord2f(1,1); glVertex3f(+1,+1,-1);
+	glTexCoord2f(0,1); glVertex3f(-1,+1,-1);
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
    //  Bottom
-		glColor3f(0.5,0.5,0.5);
-		glNormal3f(0,-1,0);
-		glVertex3f(-1,-1,-1);
-		glVertex3f(+1,-1,-1);
-		glVertex3f(+1,-1,+1);
-		glVertex3f(-1,-1,+1);
-   //  End
-		glEnd();
-	}
-   //  Undo transformations
+	glBegin(GL_QUADS);
+	glNormal3f( 0,-1, 0);
+	glVertex3f(-1,-1,-1);
+	glVertex3f(+1,-1,-1);
+	glVertex3f(+1,-1,+1);
+	glVertex3f(-1,-1,+1);
+	glEnd();
+   //  Undo transformations and textures
+	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
 
 // Pyramid idea from : http://www.planetsourcecode.com/vb/scripts/ShowCode.asp?txtCodeId=10693&lngWId=3
 static void pyramid(float x, float y, float z,
-	float dx, float dy, float dz, unsigned char c[])
+	float dx, float dy, float dz, unsigned int tex)
 {
-	unsigned char r, g, b;
-	r = c[0]; g = c[1]; b = c[2];
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, SANDSTONE);
-
 	glPushMatrix();
-	{
+	{	
 		glTranslated(x,y,z);
 		glScaled(dx,dy,dz);
 
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+
 		glBegin(GL_TRIANGLES);
-
-		// Normals calculated using cross product of vectors
-		// pointing along the edges of the triangles.
-
-		glColor3f(1,1,1);
+		glBindTexture(GL_TEXTURE_2D,tex);
 		glNormal3f(0,2,4);
-		// first triangle
-		glVertex3f(1,0,1);
-		glVertex3f(0,2,0);
-		glVertex3f(-1,0,1);
-
-		glColor3f(r,g,b);
-		glNormal3f(-4,2,0);
-		// second triangle
-		glVertex3f(-1,0,1);
-		glVertex3f(0,2,0);
-		glVertex3f(-1,0,-1);
-
-		glColor3f(1,1,1);
-		glNormal3f(0,2,-4);
-		// third triangle
-		glVertex3f(-1,0,-1);
-		glVertex3f(0,2,0);
-		glVertex3f(1,0,-1);
-
-		glColor3f(r,g,b);
-		glNormal3f(4,2,0);
-		// last triangle
-		glVertex3f(1,0,-1);
-		glVertex3f(0,2,0);
-		glVertex3f(1,0,1);
+		glTexCoord2f(0,0); glVertex3f(1,0,1);
+		glTexCoord2f(0,1); glVertex3f(0,2,0);
+		glTexCoord2f(1,1); glVertex3f(-1,0,1);
 		glEnd();
 
-		// bottom square
 		glBegin(GL_TRIANGLES);
-		glColor3f(.5,.5,.5);
-		glNormal3f(0,-1,0);
-		glVertex3f(-1,0,1);
-		glVertex3f(-1,0,-1);
-		glVertex3f(1,0,1);
-		glVertex3f(1,0,1);
-		glVertex3f(-1,0,-1);
-		glVertex3f(1,0,-1);
+		glBindTexture(GL_TEXTURE_2D,tex);
+		glNormal3f(-4,2,0);
+		glTexCoord2f(0,0); glVertex3f(-1,0,1);
+		glTexCoord2f(0,1); glVertex3f(0,2,0);
+		glTexCoord2f(1,1); glVertex3f(-1,0,-1);
 		glEnd();
+
+		glBegin(GL_TRIANGLES);
+		glBindTexture(GL_TEXTURE_2D,tex);
+		glNormal3f(0,2,-4);
+		glTexCoord2f(0,0); glVertex3f(-1,0,-1);
+		glTexCoord2f(0,1); glVertex3f(0,2,0);
+		glTexCoord2f(1,1); glVertex3f(1,0,-1);
+		glEnd();
+
+		glBegin(GL_TRIANGLES);
+		glBindTexture(GL_TEXTURE_2D,tex);
+		glNormal3f(4,2,0);
+		glTexCoord2f(0,0); glVertex3f(1,0,-1);
+		glTexCoord2f(0,1); glVertex3f(0,2,0);
+		glTexCoord2f(1,1); glVertex3f(1,0,1);
+		glEnd();
+
+		glDisable(GL_TEXTURE_2D);
 	}
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -215,10 +175,12 @@ static void pyramid(float x, float y, float z,
 // position is (x, y, z), d=dimension of base, h=height,
 // e = "pointienss", c = color
 static void drawObilisk(float x, float y, float z,
-	float d, float h, float e, unsigned char c[])
+	float d, float h, float e, unsigned int cubeTex,
+	unsigned int pyrTex)
 {
-	cube(x, y, z ,d, h, d, c);
-	pyramid(x, y+h, z, d, h/e, d, c);
+	if(cubeTex == pyrTex) { exit(1); }
+	cube(x, y, z ,d, h, d, cubeTex);
+	pyramid(x, y+h, z, d, h/e, d, pyrTex);
 }
 
 static void project()
@@ -243,54 +205,43 @@ void display()
 	double Ez = +2*dim*Cos(th)*Cos(ph);
 	gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
 
-      //  Flat or smooth shading
-	glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
-
-   //  if(light) block from ex13.c
-
-        //  Translate intensity to color vectors
-	float Ambient[]   = {0.01*ambient ,0.01*ambient ,0.01*ambient ,1.0};
-	float Diffuse[]   = {0.01*diffuse ,0.01*diffuse ,0.01*diffuse ,1.0};
-	float Specular[]  = {0.01*specular,0.01*specular,0.01*specular,1.0};
-        //  Light position
-	float Position[]  = {distance*Cos(zh),ylight,distance*Sin(zh),1.0};
-        //  Draw light position as ball (still no lighting here)
-	glColor3f(1,1,1);
-	sphere(Position[0],Position[1],Position[2] , 0.1);
-        //  OpenGL should normalize normal vectors
-	glEnable(GL_NORMALIZE);
-        //  Enable lighting
+	float Ambient[]   = {0.3,0.3,0.3,1.0};
+	float Diffuse[]   = {1,1,1,1};
+	float Specular[]  = {1,1,0,1};
+	float white[]     = {1,1,1,1};
+      //  Light direction
+	float Position[]  = {5*Cos(zh),ylight,5*Sin(zh),1};
+      //  Draw light position as ball (still no lighting here)
+	ball(Position[0],Position[1],Position[2] , 0.1);
+      //  Enable lighting with normalization
 	glEnable(GL_LIGHTING);
-        //  Location of viewer for specular calculations
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,local);
-        //  glColor sets ambient and diffuse color materials
+	glEnable(GL_NORMALIZE);
+      //  glColor sets ambient and diffuse color materials
 	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
-        //  Enable light 0
+      //  Enable light 0
 	glEnable(GL_LIGHT0);
-        //  Set ambient, diffuse, specular components and position of light 0
 	glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
 	glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
 	glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
 	glLightfv(GL_LIGHT0,GL_POSITION,Position);
+	glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,32.0f);
+	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
 
-	unsigned char red[] = {1,0,0};
-	unsigned char blue[] = {0,0,1};
-	unsigned char purp[] = {1,0,1};
 		// row1
-	drawObilisk(-1,0,0,0.15,0.75,4,red);
-	drawObilisk(0,0,0,0.15,0.75,4,blue);
-	drawObilisk(1,0,0,0.15,0.75,4,red);
+	drawObilisk(-1,0,0,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(0,0,0,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(1,0,0,0.15,0.75,4,SANDSTONE,0);
 		// row2
-	drawObilisk(-1,0,0.75,0.15,0.75,4,blue);
-	drawObilisk(0,0,0.75,0.15,0.75,4,red);
-	drawObilisk(1,0,0.75,0.15,0.75,4,blue);
+	drawObilisk(-1,0,0.75,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(0,0,0.75,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(1,0,0.75,0.15,0.75,4,SANDSTONE,0);
 		// row3
-	drawObilisk(-1,0,1.5,0.15,0.75,4,red);
-	drawObilisk(0,0,1.5,0.15,0.75,4,blue);
-	drawObilisk(1,0,1.5,0.15,0.75,4,red);
+	drawObilisk(-1,0,1.5,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(0,0,1.5,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(1,0,1.5,0.15,0.75,4,SANDSTONE,0);
 		// house?
-	drawObilisk(0,0,-1.75,1,0.75,5,purp);
+	drawObilisk(0,0,-1.75,1,0.75,5,EARTH,0);
 
    //  White
 	glColor3f(1,1,1);
@@ -303,18 +254,14 @@ void display()
 // process arrow key input to change view
 void special(int key,int x,int y)
 {
-   //  Right arrow key - increase angle by 5 degrees
-	if (key == GLUT_KEY_RIGHT)
-		th += 5;
-   //  Left arrow key - decrease angle by 5 degrees
-	else if (key == GLUT_KEY_LEFT)
-		th -= 5;
-   //  Up arrow key - increase elevation by 5 degrees
-	else if (key == GLUT_KEY_UP)
-		ph += 5;
-   //  Down arrow key - decrease elevation by 5 degrees
-	else if (key == GLUT_KEY_DOWN)
-		ph -= 5;
+	switch(key)
+	{
+		case GLUT_KEY_RIGHT: th += 5; break;
+		case GLUT_KEY_LEFT : th -= 5; break;
+		case GLUT_KEY_UP   : ph += 5; break;
+		case GLUT_KEY_DOWN : ph -= 5; break;
+		default: break;
+	}
    //  Keep angles to +/-360 degrees
 	th %= 360;
 	ph %= 360;
@@ -327,18 +274,15 @@ void key(unsigned char k, int x, int y)
 {
 	switch(k)
 	{
-		case 27: exit(0); break;
-		case 'c': cubeSep -= 0.01; break;
-		case 'C': cubeSep += 0.01; break;
+		case 27 : exit(0); break;
 		case '+': fov--; break;
 		case '-': fov++; break;
-		case 'l': light = !light; break;
 		case 's': move = !move; break;
 		case '<': ylight++; break;
 		case '>': ylight--; break;
 		case 'v': inc -= 0.1; break;
 		case 'V': inc += 0.1; break;
-		default: break;
+		default : break;
 	}
  	// make it more of a zoom-in feature:
 	if(fov < 0) { fov = 0; }
@@ -382,6 +326,8 @@ int main(int argc,char* argv[])
 	glutKeyboardFunc(key);
 	glutIdleFunc(idle);
 	SANDSTONE = LoadTexBMP("AshySandstone.bmp");
+	EARTH = LoadTexBMP("earth.bmp");
+	ErrCheck("init");
 	glutMainLoop();
 	return 0;
 }
