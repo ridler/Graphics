@@ -22,8 +22,8 @@ float shinyvec[1];    // Shininess (value)
 short zh        =  90;  // Light azimuth
 float ylight = 0;  // Elevation of light
 
-unsigned int SANDSTONE = 0;
-unsigned int EARTH = 0;
+// textures
+unsigned int SANDSTONE, EARTH, COPPER, SUN;
 
 int th=0;	//  Azimuth of view angle
 int ph=0;	//  Elevation of view angle
@@ -36,17 +36,48 @@ int fov = 50;	// field of view
 float asp=1.0;	//  Aspemct ratio
 float dim=5.0;	//  Size of world
 
-static void ball(double x,double y,double z,double r)
+static inline void Vertex(double th,double ph)
 {
-   //  Save transformation
-	glPushMatrix();
-   //  Offset, scale and rotate
+	double x = Sin(th)*Cos(ph);
+	double y = Cos(th)*Cos(ph);
+	double z =         Sin(ph);
+	glNormal3d(x,y,z);
+	glTexCoord2d(th/360.0,ph/180.0+0.5);
+	glVertex3d(x,y,z);
+}
+
+static void sphere(float x, float y, float z, float r,
+	unsigned int tex)
+{
+	const unsigned char d = 5;
+	short t, p;
+
 	glTranslated(x,y,z);
 	glScaled(r,r,r);
-   //  White ball
+	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tex);
+   		//  Latitude bands
+	for (p=-90;p<90;p+=d)
+	{
+		glBegin(GL_QUAD_STRIP);
+		for (t=0;t<=360;t+=d)
+		{
+			Vertex(t,p);
+			Vertex(t,p+d);
+		}
+		glEnd();
+	}
+	glDisable(GL_TEXTURE_2D);
+}
+
+static void ball(double x,double y,double z,double r)
+{
+	glPushMatrix();
+	glTranslated(x,y,z);
+	glScaled(r,r,r);
 	glColor3f(1,1,1);
 	glutSolidSphere(1.0,16,16);
-   //  Undo transofrmations
 	glPopMatrix();
 }
 
@@ -60,7 +91,6 @@ static void cube(float x, float y, float z,
 
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-
    //	Front
 	glBindTexture(GL_TEXTURE_2D,tex);
 	glBegin(GL_QUADS);
@@ -119,7 +149,6 @@ static void cube(float x, float y, float z,
    //  Undo transformations and textures
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
 }
 
 // Pyramid idea from : http://www.planetsourcecode.com/vb/scripts/ShowCode.asp?txtCodeId=10693&lngWId=3
@@ -169,7 +198,6 @@ static void pyramid(float x, float y, float z,
 		glDisable(GL_TEXTURE_2D);
 	}
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
 }
 
 // position is (x, y, z), d=dimension of base, h=height,
@@ -178,7 +206,6 @@ static void drawObilisk(float x, float y, float z,
 	float d, float h, float e, unsigned int cubeTex,
 	unsigned int pyrTex)
 {
-	if(cubeTex == pyrTex) { exit(1); }
 	cube(x, y, z ,d, h, d, cubeTex);
 	pyramid(x, y+h, z, d, h/e, d, pyrTex);
 }
@@ -211,7 +238,7 @@ void display()
 	float white[]     = {1,1,1,1};
       //  Light direction
 	float Position[]  = {5*Cos(zh),ylight,5*Sin(zh),1};
-      //  Draw light position as ball (still no lighting here)
+      //  Draw light position as ball
 	ball(Position[0],Position[1],Position[2] , 0.1);
       //  Enable lighting with normalization
 	glEnable(GL_LIGHTING);
@@ -219,7 +246,7 @@ void display()
       //  glColor sets ambient and diffuse color materials
 	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
-      //  Enable light 0
+      //  Enable light
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
 	glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
@@ -229,22 +256,21 @@ void display()
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
 
 		// row1
-	drawObilisk(-1,0,0,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(0,0,0,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(1,0,0,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(-1,0,0,0.15,0.75,4,SANDSTONE,SANDSTONE);
+	drawObilisk(0,0,0,0.15,0.75,4,COPPER,COPPER);
+	drawObilisk(1,0,0,0.15,0.75,4,SANDSTONE,SANDSTONE);
 		// row2
-	drawObilisk(-1,0,0.75,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(0,0,0.75,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(1,0,0.75,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(-1,0,0.75,0.15,0.75,4,SANDSTONE,SANDSTONE);
+	drawObilisk(0,0,0.75,0.15,0.75,4,COPPER,COPPER);
+	drawObilisk(1,0,0.75,0.15,0.75,4,SANDSTONE,SANDSTONE);
 		// row3
-	drawObilisk(-1,0,1.5,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(0,0,1.5,0.15,0.75,4,SANDSTONE,0);
-	drawObilisk(1,0,1.5,0.15,0.75,4,SANDSTONE,0);
+	drawObilisk(-1,0,1.5,0.15,0.75,4,SANDSTONE,SANDSTONE);
+	drawObilisk(0,0,1.5,0.15,0.75,4,COPPER,COPPER);
+	drawObilisk(1,0,1.5,0.15,0.75,4,SANDSTONE,SANDSTONE);
 		// house?
-	drawObilisk(0,0,-1.75,1,0.75,5,EARTH,0);
-
-   //  White
-	glColor3f(1,1,1);
+	drawObilisk(0,0,-1.75,1,0.75,5,EARTH,EARTH);
+	// SUN
+	sphere(0,2,-4, 1, SUN);
    //  Render the scene
 	glFlush();
    //  Make the rendered scene visible
@@ -327,7 +353,8 @@ int main(int argc,char* argv[])
 	glutIdleFunc(idle);
 	SANDSTONE = LoadTexBMP("AshySandstone.bmp");
 	EARTH = LoadTexBMP("earth.bmp");
-	ErrCheck("init");
+	COPPER = LoadTexBMP("copper.bmp");
+	SUN = LoadTexBMP("sun.bmp");
 	glutMainLoop();
 	return 0;
 }
